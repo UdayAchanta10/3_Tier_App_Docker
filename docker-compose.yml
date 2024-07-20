@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    build: ./db
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: testdb
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: testdb
+    ports:
+      - "3000:3000"
+    command: ["./wait-for-it.sh", "db:3306", "--", "npm", "start"]
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
